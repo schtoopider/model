@@ -1,0 +1,40 @@
+import discord
+from discord import embeds
+import discord_slash
+from discord_slash import *
+from discord_slash.model import *
+from discord_slash.utils.manage_commands import *
+from resources import *
+import sqlite3, datetime
+
+
+con = sqlite3.connect("/Users/richard/Kreg/servants of kreg.db")
+c = con.cursor()
+
+
+
+
+def msc(id: int, amount: int):
+    c.execute("SELECT * FROM users WHERE user_id = (?)", [id])
+    user = c.fetchall()
+    if user == []:
+        c.execute("INSERT INTO users VALUES (?,?,?)", [id, datetime.datetime.now(), amount])
+        con.commit()
+    else:
+        c.execute("UPDATE users SET social_credit = (?) WHERE user_id = (?)", [int(user[0][2]) + amount, id])
+        con.commit()
+
+def rsd(id: int):
+    c.execute("SELECT * FROM users WHERE user_id = (?)", [id])
+    fetch = c.fetchall()
+    if fetch == []:
+        return 0
+    return int(fetch[0][2])
+
+
+
+async def gm(ctx, words: str = "damogus", emoji: str = None):
+    embed = discord.Embed(description = words, colour = colour.black)
+    message = await ctx.send(embed = embed)
+    if emoji != None:
+        await message.add_reaction(emoji)
